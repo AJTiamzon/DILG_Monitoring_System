@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      crossorigin="anonymous"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body{
+          padding-top: 4%;
+      }
+
+      .navbar{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+      }
+
+      .nav-item{
+        color: white;
+        margin-top: 1%;
+        margin-left: 1%;
+      }
+
+      body{
+        background-image: url(https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/Tarlac_City_Hall_front_%28Rizal_Street%2C_Tarlac_City%3B_07-23-2023%29.jpg/960px-Tarlac_City_Hall_front_%28Rizal_Street%2C_Tarlac_City%3B_07-23-2023%29.jpg?20230728013407);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+      }
+
+      .side-bar{
+        position: fixed; /* Keep it fixed so it doesn’t scroll away */
+        top: 10;
+        left: 0;
+        width: 15%; /* Keep this consistent */
+        height: 100vh; /* Make it take the full height */
+        background-image: url(https://i.pinimg.com/474x/51/4b/96/514b96d37dd70229b2b6d4f708985687.jpg);
+        background-repeat:no-repeat;
+        background-size:100% 100%;
+        padding-top: 50px;
+      }
+
+      {% if user.is_authenticated %}
+      .container {
+        margin-left: 15%; /* Adjust this based on sidebar width */
+        margin-top: 2%;
+      }
+      {% endif %}
+
+      .nav {
+        color: black;
+        font-weight: bold;
+        width: 80%;
+        padding: 1%;
+        border-radius: 3%;
+        transition: transform 0.2s ease-in-out; /* Smooth hover effect */
+        display: inline-block; /* Ensures smooth scaling */
+        text-align: center;
+        margin-top: 4%;
+        margin-bottom: 4%;
+        margin-left: 8%;
+      }
+
+      .nav:hover {
+        transform: scale(1.2); /* Makes only the hovered button larger */
+        color: black;
+      }
+
+      #create-barang {
+        background-color: white;
+      }
+
+      #view-list {
+        background-color: dodgerblue;
+      }
+
+      #search-barang {
+        background-color: yellow;
+      }
+
+      #barang-charts {
+        background-color: red;
+      }
+    </style>
+
+    <title>{% block title %}Home{% endblock %}</title>
+
+    {% block head %} {% endblock %}
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbar"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbar">
+        <div class="navbar-nav">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Department_of_the_Interior_and_Local_Government_%28DILG%29_Seal_-_Logo.svg/1024px-Department_of_the_Interior_and_Local_Government_%28DILG%29_Seal_-_Logo.svg.png"
+          style="max-width: 4%; max-height: 4%;" alt="">
+          {% if user.is_authenticated %}
+          <a class="nav-item" id="home" href="/">Home</a>
+          <a class="nav-item" id="logout" href="/logout">Logout</a>
+          {% else %}
+          <a class="nav-item" id="login" href="/login">Login</a>
+          <a class="nav-item" id="signUp" href="/sign-up">Sign Up</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    {% if user.is_authenticated %}
+    <div class="side-bar">
+      <a class="nav" id="view-list" href="/barang_list">View Barangay Records</a>
+      <a class="nav" id="barang-charts" href="/barangay_charts">View Barangay Charts</a>
+      <a class="nav" id="search-barang" href="/find_barangay">Search Barangay Record</a>
+      <a class="nav" id="create-barang" href="/create_barang">Add New Barangay Month</a>
+    </div>
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %} {% if category ==
+    'error' %}
+    <div class="alert alert-danger alter-dismissable fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% else %}
+    <div class="alert alert-success alter-dismissable fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endif %} {% endfor %} {% endif %} {% endwith %}
+
+    <div class="container">{% block content %} {% endblock %}</div>
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+
+{% block javascript %}
+<script type="text/javascript">
+
+function deleteNote(noteId) {
+  fetch("/delete-note", {
+    method: "POST",
+    body: JSON.stringify({ noteId: noteId }),
+  }).then((_res) => {
+    window.location.href = "/";
+  });
+  }
+
+function table_road_kp_vawc() {
+ var x = document.getElementById("table-road-kp-vawc")
+ var y = document.getElementById("table-road-kp-vawc-btn")
+  if (x.style.display === "" && y.style.backgroundColor === "cyan"){
+    x.style.display = "none"
+    y.style.backgroundColor = "yellow"
+  } else {
+    x.style.display = ""
+    y.style.backgroundColor = "cyan"
+ }
+}
+
+function table_manila_bay() {
+ var x = document.getElementById("table-manila-bay")
+ var y = document.getElementById("table-manila-bay-btn")
+  if (x.style.display === "" && y.style.backgroundColor === "cyan"){
+    x.style.display = "none"
+    y.style.backgroundColor = "yellow"
+  } else {
+    x.style.display = ""
+    y.style.backgroundColor = "cyan"
+ }
+}
+
+function table_job_bfdp_kasambahay() {
+ var x = document.getElementById("table-job-bfdp-kasambahay")
+ var y = document.getElementById("table-job-bfdp-kasambahay-btn")
+  if (x.style.display === "" && y.style.backgroundColor === "cyan"){
+    x.style.display = "none"
+    y.style.backgroundColor = "yellow"
+  } else {
+    x.style.display = ""
+    y.style.backgroundColor = "cyan"
+ }
+}
+
+function table_kalinisan() {
+ var x = document.getElementById("table-kalinisan")
+ var y = document.getElementById("table-kalinisan-btn")
+  if (x.style.display === "" && y.style.backgroundColor === "cyan"){
+    x.style.display = "none"
+    y.style.backgroundColor = "yellow"
+  } else {
+    x.style.display = ""
+    y.style.backgroundColor = "cyan"
+ }
+}
+
+function updateSelectColor(selectElement) {
+    // Get the selected option value
+    let selectedValue = selectElement.value;
+
+    // Define color mapping
+    let colors = {
+        "completed": "lightgreen",
+        "incomplete": "cyan",
+        "unsubmitted": "orange",
+        "late": "red",
+        "unedited": "white"
+    };
+
+    // Apply background color based on selection
+    selectElement.style.backgroundColor = colors[selectedValue] || "white";
+    selectElement.style.fontWeight = "bold"; // Make text bold for better visibility
+}
+
+</script>
+
+{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+{% block title %}Barangay List{% endblock %}
+{% block content %}
+
+    <div class="card shadow">
+        <div class="card-header text-center bg-info text-black font-weight-bold">
+
+            <h1>Barangay List</h1>
+
+            <form method="POST" action="/find_barangay_year_month">
+                <label for="barangay_year">Select Year</label>
+                <select name="barangay_year" id="barangay_year">
+                    <option value="2025" selected>2025</option>
+                    {% for year in barang_years1 %}
+                    <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
+    
+                <label for="barangay_year">Select Month</label>
+                <select name="barangay_month" id="barangay_month">
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
+    
+                <button type="submit" class="btn-primary">Search</button>
+            </form>
+
+        </div>
+
+        <div class="card-body">
+            <div class="d-flex justify-content-start">
+                <button type="button" id="table-road-kp-vawc-btn" style="background-color: cyan;" onclick="table_road_kp_vawc()">Road KP VAWC</button>
+                <button type="button" id="table-job-bfdp-kasambahay-btn" style="background-color: cyan; margin-left: 0.5%;" onclick="table_job_bfdp_kasambahay()">Job BFDP Kasambahay</button>
+                <button type="button" id="table-manila-bay-btn" style="background-color: cyan; margin-left: 0.5%;" onclick="table_manila_bay()">Manila Bay</button>
+                <button type="button" id="table-kalinisan-btn" style="background-color: cyan; margin-left: 0.5%;" onclick="table_kalinisan()">Table Kalinisan</button>
+            </div>
+
+            <form method="POST" action="/barang_list">
+                <div class="d-flex justify-content-center" style="margin-top: 10px; margin-bottom: 10px;">
+                    <button class="btn btn-success" type="submit">Save Changes</button>
+                </div>
+
+                <!-- First Table -->
+                <div class="table-responsive">
+                    <table id="table-road-kp-vawc" class="table table-bordered table-striped text-center" style="">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Barangay Name</th>
+                                <th>Added By</th>
+                                <th>Year</th>
+                                <th>Month</th>
+                                <th>Road Clearing</th>
+                                <th>KP</th>
+                                <th>VAWC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if month_year_list %}
+                            {% for data in month_year_list %}
+                            <tr>
+                                <td>{{ data.barang_name }}</td>
+                                <td>{{ data.added_by }}</td>
+                                <td>{{ data.year }}</td>
+                                <td>{{ data.month }}</td>
+                                <td>
+                                    <select name="road_clearing_{{ data.id }}" class="form-select" id="road_clearing_{{ data.id }}"
+                                    {% if data.road_clearing == "completed" %}
+                                    style="background-color: lightgreen; font-weight: bold;"
+                                    {% elif data.road_clearing == "incomplete" %}
+                                    style="background-color: cyan; font-weight: bold;"
+                                    {% elif data.road_clearing == "unsubmitted" %}
+                                    style="background-color: orange; font-weight: bold;"
+                                    {% elif data.road_clearing == "late" %}
+                                    style="background-color: red; font-weight: bold;"
+                                    {% endif %} onchange="updateSelectColor(this)">
+                                        <option value="{{ data.road_clearing }}" selected>{{ data.road_clearing }}</option>
+                                        <option value="unedited" style="background-color: white;">unedited</option>
+                                        <option value="completed" style="background-color: lightgreen;">completed</option>
+                                        <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                        <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                        <option value="late" style="background-color: red;">late</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="kp_{{ data.id }}" class="form-select"
+                                    {% if data.kp == "completed" %}
+                                    style="background-color: lightgreen; font-weight: bold;"
+                                    {% elif data.kp == "incomplete" %}
+                                    style="background-color: cyan; font-weight: bold;"
+                                    {% elif data.kp == "unsubmitted" %}
+                                    style="background-color: orange; font-weight: bold;"
+                                    {% elif data.kp == "late" %}
+                                    style="background-color: red; font-weight: bold;"
+                                    {% endif %} onchange="updateSelectColor(this)">
+                                        <option value="{{ data.kp }}" selected>{{ data.kp }}</option>
+                                        <option value="unedited" style="background-color: white;">unedited</option>
+                                        <option value="completed" style="background-color: lightgreen;">completed</option>
+                                        <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                        <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                        <option value="late" style="background-color: red;">late</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="vawc_{{ data.id }}" class="form-select"
+                                    {% if data.vawc == "completed" %}
+                                    style="background-color: lightgreen; font-weight: bold;"
+                                    {% elif data.vawc == "incomplete" %}
+                                    style="background-color: cyan; font-weight: bold;"
+                                    {% elif data.vawc == "unsubmitted" %}
+                                    style="background-color: orange; font-weight: bold;"
+                                    {% elif data.vawc == "late" %}
+                                    style="background-color: red; font-weight: bold;"
+                                    {% endif %} onchange="updateSelectColor(this)">
+                                        <option value="{{ data.vawc }}" selected>{{ data.vawc }}</option>
+                                        <option value="unedited" style="background-color: white;">unedited</option>
+                                        <option value="completed" style="background-color: lightgreen;">completed</option>
+                                        <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                        <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                        <option value="late" style="background-color: red;">late</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Second Table -->
+                <div class="table-responsive mt-4">
+                    <table id="table-job-bfdp-kasambahay" class="table table-bordered table-striped text-center" style="">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Barangay Name</th>
+                                <th>Added By</th>
+                                <th>Year</th>
+                                <th>Month</th>
+                                <th>First Time Job Seeking</th>
+                                <th>BFDP</th>
+                                <th>Kasambahay</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if month_year_list %}
+                            {% for data in month_year_list %}
+                            <tr>
+                                <td>{{ data.barang_name }}</td>
+                                <td>{{ data.added_by }}</td>
+                                <td>{{ data.year }}</td>
+                                <td>{{ data.month }}</td>
+                                <td>
+                                    <select name="first_time_job_seeking_{{ data.id }}" class="form-select"
+                                    {% if data.first_time_job_seeking == "completed" %}
+                                    style="background-color: lightgreen; font-weight: bold;"
+                                    {% elif data.first_time_job_seeking == "incomplete" %}
+                                    style="background-color: cyan; font-weight: bold;"
+                                    {% elif data.first_time_job_seeking == "unsubmitted" %}
+                                    style="background-color: orange; font-weight: bold;"
+                                    {% elif data.first_time_job_seeking == "late" %}
+                                    style="background-color: red; font-weight: bold;"
+                                    {% endif %} onchange="updateSelectColor(this)">
+                                        <option value="{{ data.first_time_job_seeking }}" selected>{{ data.first_time_job_seeking }}</option>
+                                        <option value="unedited" style="background-color: white;">unedited</option>
+                                        <option value="completed" style="background-color: lightgreen;">completed</option>
+                                        <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                        <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                        <option value="late" style="background-color: red;">late</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="bfdp_{{ data.id }}" class="form-select"
+                                    {% if data.bfdp == "completed" %}
+                                    style="background-color: lightgreen; font-weight: bold;"
+                                    {% elif data.bfdp == "incomplete" %}
+                                    style="background-color: cyan; font-weight: bold;"
+                                    {% elif data.bfdp == "unsubmitted" %}
+                                    style="background-color: orange; font-weight: bold;"
+                                    {% elif data.bfdp == "late" %}
+                                    style="background-color: red; font-weight: bold;"
+                                    {% endif %} onchange="updateSelectColor(this)">
+                                        <option value="{{ data.bfdp }}" selected>{{ data.bfdp }}</option>
+                                        <option value="unedited" style="background-color: white;">unedited</option>
+                                        <option value="completed" style="background-color: lightgreen;">completed</option>
+                                        <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                        <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                        <option value="late" style="background-color: red;">late</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="kasambahay_{{ data.id }}" class="form-select"
+                                    {% if data.kasambahay == "completed" %}
+                                    style="background-color: lightgreen; font-weight: bold;"
+                                    {% elif data.kasambahay == "incomplete" %}
+                                    style="background-color: cyan; font-weight: bold;"
+                                    {% elif data.kasambahay == "unsubmitted" %}
+                                    style="background-color: orange; font-weight: bold;"
+                                    {% elif data.kasambahay == "late" %}
+                                    style="background-color: red; font-weight: bold;"
+                                    {% endif %} onchange="updateSelectColor(this)">
+                                        <option value="{{ data.kasambahay }}" selected>{{ data.kasambahay }}</option>
+                                        <option value="unedited" style="background-color: white;">unedited</option>
+                                        <option value="completed" style="background-color: lightgreen;">completed</option>
+                                        <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                        <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                        <option value="late" style="background-color: red;">late</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Third Table -->
+                <div class="table-responsive mt-4">
+                    <table id="table-manila-bay" class="table table-bordered table-striped text-center" style="">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Barangay Name</th>
+                                <th>Added By</th>
+                                <th>Year</th>
+                                <th>Month</th>
+                                <th colspan="5">Manila Bay</th>
+                            </tr>
+                            <tr>
+                                <th colspan="4"></th>
+                                <th>Week 1</th>
+                                <th>Week 2</th>
+                                <th>Week 3</th>
+                                <th>Week 4</th>
+                                <th>Week 5</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if month_year_list %}
+                            {% for data in month_year_list %}
+                            <tr>
+                                <td>{{ data.barang_name }}</td>
+                                <td>{{ data.added_by }}</td>
+                                <td>{{ data.year }}</td>
+                                <td>{{ data.month }}</td>
+                                {% for week in range(1, 6) %}
+                                <td>
+                                    <select name="manila_bay_w{{ week }}_{{ data.id }}" class="form-select"
+                                    {% if data['manila_bay_w' ~ week] == "completed" %}
+                                    style="background-color: lightgreen; font-weight: bold;"
+                                    {% elif data['manila_bay_w' ~ week] == "incomplete" %}
+                                    style="background-color: cyan; font-weight: bold;"
+                                    {% elif data['manila_bay_w' ~ week] == "unsubmitted" %}
+                                    style="background-color: orange; font-weight: bold;"
+                                    {% elif data['manila_bay_w' ~ week] == "late" %}
+                                    style="background-color: red; font-weight: bold;"
+                                    {% endif %} onchange="updateSelectColor(this)">
+                                        <option value="{{ data['manila_bay_w' ~ week] }}" selected>{{ data['manila_bay_w' ~ week] }}</option>
+                                        <option value="unedited" style="background-color: white;">unedited</option>
+                                        <option value="completed" style="background-color: lightgreen;">completed</option>
+                                        <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                        <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                        <option value="late" style="background-color: red;">late</option>
+                                    </select>
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Fourth Table -->
+                <div class="table-responsive mt-4">
+                    <table id="table-kalinisan" class="table table-bordered table-striped text-center" style="">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Barangay Name</th>
+                                <th>Added By</th>
+                                <th>Year</th>
+                                <th>Month</th>
+                                <th colspan="5">Kalinisan</th>
+                            </tr>
+                            <tr>
+                                <th colspan="4"></th>
+                                <th>Week 1</th>
+                                <th>Week 2</th>
+                                <th>Week 3</th>
+                                <th>Week 4</th>
+                                <th>Week 5</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if month_year_list %}
+                            {% for data in month_year_list %}
+                            <tr>
+                                <td>{{ data.barang_name }}</td>
+                                <td>{{ data.added_by }}</td>
+                                <td>{{ data.year }}</td>
+                                <td>{{ data.month }}</td>
+                                {% for week in range(1, 6) %}
+                                <td>
+                                    <select name="kalinisan_w{{ week }}_{{ data.id }}" class="form-select"
+                                    {% if data['kalinisan_w' ~ week] == "completed" %}
+                                    style="background-color: lightgreen; font-weight: bold;"
+                                    {% elif data['kalinisan_w' ~ week] == "incomplete" %}
+                                    style="background-color: cyan; font-weight: bold;"
+                                    {% elif data['kalinisan_w' ~ week] == "unsubmitted" %}
+                                    style="background-color: orange; font-weight: bold;"
+                                    {% elif data['kalinisan_w' ~ week] == "late" %}
+                                    style="background-color: red; font-weight: bold;"
+                                    {% endif %} onchange="updateSelectColor(this)">
+                                        <option value="{{ data['kalinisan_w' ~ week] }}" selected>{{ data['kalinisan_w' ~ week] }}</option>
+                                        <option value="unedited" style="background-color: white;">unedited</option>
+                                        <option value="completed" style="background-color: lightgreen;">completed</option>
+                                        <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                        <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                        <option value="late" style="background-color: red;">late</option>
+                                    </select>
+                                </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends "base.html" %} 
+{% block title %}Home{% endblock %}
+
+{% block head %}
+
+<style>
+    /* Style to make the charts bigger */
+    .chart-container {
+        width: 100%;
+        max-width: 100%; /* Controls max width */
+        margin: 30px auto; /* Centers the charts */
+        text-align: center;
+    }
+
+    canvas {
+        width: 100% !important;
+        height: 400px !important; /* Make charts bigger */
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-header text-center bg-info text-black font-weight-bold">
+        <h1 align="center">Barangay Report Charts</h1>
+        <form method="POST">
+            <label for="year_req">Select Year:</label>
+            <select name="year_req" id="year_req">
+                {% for year in barang_years1 %}
+                <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="month_req">Select Month:</label>
+            <select name="month_req" id="month_req">
+                {% for month in months %}
+                <option value="{{ month }}">{{ month }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-primary">Check</button>
+        </form>
+    </div>
+
+    <div class="card-body">
+        {# Centered and Enlarged Charts #}
+        <div class="chart-container">
+            <h4 class="text-center">Aguso To Culipat</h4>
+            <canvas id="chart1"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h4 class="text-center">Cut Cut 1 To San Manuel</h4>
+            <canvas id="chart2"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h4 class="text-center">San Miguel To Villa Bacolor</h4>
+            <canvas id="chart3"></canvas>
+        </div>
+    </div>
+</div>
+
+    <script>
+        // Data from Flask
+        const barangayChartData = {{ barangay_chart_data | tojson }};
+        
+        // Extract all barangay names
+        const allBarangays = Object.keys(barangayChartData);
+        
+        // Split barangays into 3 equal parts
+        const total = allBarangays.length;
+        const split1 = Math.ceil(total / 3);
+        const split2 = split1 * 2;
+
+        const barangays1 = allBarangays.slice(0, split1);
+        const barangays2 = allBarangays.slice(split1, split2);
+        const barangays3 = allBarangays.slice(split2);
+
+        // Function to get data for a group
+        function getChartData(barangays) {
+            return {
+                labels: barangays,
+                datasets: [
+                    {
+                        label: "Late",
+                        data: barangays.map(name => barangayChartData[name]["Late"]),
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: "Completed",
+                        data: barangays.map(name => barangayChartData[name]["Completed"]),
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: "Others",
+                        data: barangays.map(name => barangayChartData[name]["Others"]),
+                        backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            };
+        }
+
+        // Function to create charts
+        function createChart(ctx, data) {
+            return new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Allow bigger height
+                    scales: {
+                        x: { stacked: false },
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Create 3 separate charts
+        createChart(document.getElementById('chart1').getContext('2d'), getChartData(barangays1));
+        createChart(document.getElementById('chart2').getContext('2d'), getChartData(barangays2));
+        createChart(document.getElementById('chart3').getContext('2d'), getChartData(barangays3));
+    </script>
+
+{% endblock %}

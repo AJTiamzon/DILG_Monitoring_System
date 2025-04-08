@@ -1,0 +1,56 @@
+{% extends "base.html" %} 
+{% block title %}Home{% endblock %} 
+{% block content %}
+
+{% block head %}
+<style>
+</style>
+{% endblock %}
+<div class="card shadow">
+
+  <div class="card-header bg-info text-black font-weight-bold">
+    <h1 class="text-center">Create New Barangay Month Section</h1>
+  </div>
+
+  <div class="d-flex justify-content-center">
+    <div class="card-body">
+      <div class="d-flex justify-content-center text-center font-weight-bold">
+        <form method="POST">
+          <label for="added_by" class="form-label">Added To Database By:</label>
+          <select class="form-control" name="added_by" id="added_by">
+            <option value="Adrian Tiamzon">Adrian Tiamzon</option>
+            <option value="Rod Mark Salvador">Rod Mark Salvador</option>
+            <option value="Joel Iglesias">Joel Iglesias</option>
+            <option value="Gindy Rose Campuued">Gindy Rose Campuued</option>
+            <option value="Christopher Clemente">Christopher Clemente</option>
+            <option value="Johnelle Pulmano">Johnelle Pulmano</option>
+            <option value="Irene Bildan">Irene Bildan</option>
+          </select>
+        
+          <label for="year" class="form-label">Year:</label>
+          <input type="number" class="form-control" id="year" name="year" min="2020">
+          
+          <label for="month" class="form-label">Month:</label>
+          <select class="form-control" name="month" id="month">
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+          </select>
+          <br>
+          <button type="submit" class="btn btn-primary">Add Barangay</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+%}
+
+{% block head %}
+<style>
+  
+</style>
+{% endblock %}
+<div class="card shadow" style="width: 100%;">
+  <div class="card-header bg-info text-black font-weight-bold">
+
+    <h1>Notes For Everyone:</h1>
+
+  </div>
+
+      <div class="card-body">
+
+        <div class="d-flex justify-content-center">
+          <div class="card shadow" style="width: 60%;">
+            <div class="card-body">
+              <ul class="list-group list-group-flush" id="notes">
+                {% for note in notes %}
+                <li class="list-group-item"> 
+                  {{ note.data }}
+                  <button type="button" class="close" onClick="deleteNote({{ note.id }})">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </li>
+                {% endfor %}
+              </ul>
+              <form method="POST" >
+                <textarea name="note" id="note" class="form-control"></textarea>
+                <br />
+                <div align="center">
+                  <button type="submit" class="btn btn-primary">Add Note</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        
+    </div>
+
+</div>
+{% endblock %}

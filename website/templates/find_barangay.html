@@ -1,0 +1,278 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content%}
+<div class="card shadow">
+    <div class="card-header text-center bg-info text-black font-weight-bold">
+        <h1 align="center">Select Year And Month Of Barangay To View</h1>
+        <div class="d-flex justify-content-center">
+            <form method="POST">
+                <label for="barangay_year">Select Year</label>
+                <select name="barangay_year" id="barangay_year">
+                    <option value="2025" selected>2025</option>
+                    {% for year in barang_years1 %}
+                    <option value="{{year}}">{{year}}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="barangay_year">Select Month</label>
+
+                <select name="barangay_month" id="barangay_month">
+                    <option value="January">January</option>
+                    <option value="February">February</option>
+                    <option value="March">March</option>
+                    <option value="April">April</option>
+                    <option value="May">May</option>
+                    <option value="June">June</option>
+                    <option value="July">July</option>
+                    <option value="August">August</option>
+                    <option value="September">September</option>
+                    <option value="October">October</option>
+                    <option value="November">November</option>
+                    <option value="December">December</option>
+                </select>
+
+                <label for="barangay_name">Select Barangay</label>
+                <select name="barangay_name" id="barangay_name">
+                    {% for b_names in barang_names %}
+                    <option value="{{b_names.barang_name}}">{{b_names.barang_name}}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card-body">
+        {% if selected_barang %}
+        <form action="/find_barangay_save_changes" method="POST">
+            <div class="d-flex justify-content-between">
+                <h3>Year: {{ selected_barang.year }}</h3>
+                <input type="hidden" name="selected_barang_year" id="" value="{{ selected_barang.year }}">
+                <h3>Month: {{ selected_barang.month }}</h3>
+                <input type="hidden" name="selected_barang_month" id="" value="{{ selected_barang.month }}">
+                <h3>Barangay: {{ selected_barang.barang_name }}</h3>
+                <input type="hidden" name="selected_barang_name" id="" value="{{ selected_barang.barang_name }}">
+                <button class="btn btn-success" type="submit">Save Changes</button>
+                <a href="/find_barangay" class="btn btn-primary">Refresh</a>
+            </div>
+            <div class="table-responsive mt-4">
+                <table id="table-job-bfdp-kasambahay" class="table table-bordered table-striped text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Road Clearing</th>
+                            <th>KP</th>
+                            <th>VAWC</th>
+                            <th>First Time Job Seeking</th>
+                            <th>BFDP</th>
+                            <th>Kasambahay</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <select name="road_clearing_{{ selected_barang.id }}" class="form-select"
+                                {% if selected_barang.road_clearing == "completed" %}
+                                style="background-color: lightgreen; font-weight: bold;"
+                                {% elif selected_barang.road_clearing == "incomplete" %}
+                                style="background-color: cyan; font-weight: bold;"
+                                {% elif selected_barang.road_clearing == "unsubmitted" %}
+                                style="background-color: orange; font-weight: bold;"
+                                {% elif selected_barang.road_clearing == "late" %}
+                                style="background-color: red; font-weight: bold;"
+                                {% endif %} onchange="updateSelectColor(this)">
+                                    <option value="{{ selected_barang.road_clearing }}" selected>{{ selected_barang.road_clearing }}</option>
+                                    <option value="unedited" style="background-color: white;">unedited</option>
+                                    <option value="completed" style="background-color: lightgreen;">completed</option>
+                                    <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                    <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                    <option value="late" style="background-color: red;">late</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="kp_{{ selected_barang.id }}" class="form-select"
+                                {% if selected_barang.kp == "completed" %}
+                                style="background-color: lightgreen; font-weight: bold;"
+                                {% elif selected_barang.kp == "incomplete" %}
+                                style="background-color: cyan; font-weight: bold;"
+                                {% elif selected_barang.kp == "unsubmitted" %}
+                                style="background-color: orange; font-weight: bold;"
+                                {% elif selected_barang.kp == "late" %}
+                                style="background-color: red; font-weight: bold;"
+                                {% endif %} onchange="updateSelectColor(this)">
+                                    <option value="{{ selected_barang.kp }}" selected>{{ selected_barang.kp }}</option>
+                                    <option value="unedited" style="background-color: white;">unedited</option>
+                                    <option value="completed" style="background-color: lightgreen;">completed</option>
+                                    <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                    <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                    <option value="late" style="background-color: red;">late</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="vawc_{{ selected_barang.id }}" class="form-select"
+                                {% if selected_barang.vawc == "completed" %}
+                                style="background-color: lightgreen; font-weight: bold;"
+                                {% elif selected_barang.vawc == "incomplete" %}
+                                style="background-color: cyan; font-weight: bold;"
+                                {% elif selected_barang.vawc == "unsubmitted" %}
+                                style="background-color: orange; font-weight: bold;"
+                                {% elif selected_barang.vawc == "late" %}
+                                style="background-color: red; font-weight: bold;"
+                                {% endif %} onchange="updateSelectColor(this)">
+                                    <option value="{{ selected_barang.vawc }}" selected>{{ selected_barang.vawc }}</option>
+                                    <option value="unedited" style="background-color: white;">unedited</option>
+                                    <option value="completed" style="background-color: lightgreen;">completed</option>
+                                    <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                    <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                    <option value="late" style="background-color: red;">late</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="first_time_job_seeking_{{ selected_barang.id }}" class="form-select"
+                                {% if selected_barang.first_time_job_seeking == "completed" %}
+                                style="background-color: lightgreen; font-weight: bold;"
+                                {% elif selected_barang.first_time_job_seeking == "incomplete" %}
+                                style="background-color: cyan; font-weight: bold;"
+                                {% elif selected_barang.first_time_job_seeking == "unsubmitted" %}
+                                style="background-color: orange; font-weight: bold;"
+                                {% elif selected_barang.first_time_job_seeking == "late" %}
+                                style="background-color: red; font-weight: bold;"
+                                {% endif %} onchange="updateSelectColor(this)">
+                                    <option value="{{ selected_barang.first_time_job_seeking }}" selected>{{ selected_barang.first_time_job_seeking }}</option>
+                                    <option value="unedited" style="background-color: white;">unedited</option>
+                                    <option value="completed" style="background-color: lightgreen;">completed</option>
+                                    <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                    <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                    <option value="late" style="background-color: red;">late</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="bfdp_{{ selected_barang.id }}" class="form-select"
+                                {% if selected_barang.bfdp == "completed" %}
+                                style="background-color: lightgreen; font-weight: bold;"
+                                {% elif selected_barang.bfdp == "incomplete" %}
+                                style="background-color: cyan; font-weight: bold;"
+                                {% elif selected_barang.bfdp == "unsubmitted" %}
+                                style="background-color: orange; font-weight: bold;"
+                                {% elif selected_barang.bfdp == "late" %}
+                                style="background-color: red; font-weight: bold;"
+                                {% endif %} onchange="updateSelectColor(this)">
+                                    <option value="{{ selected_barang.bfdp }}" selected>{{ selected_barang.bfdp }}</option>
+                                    <option value="unedited" style="background-color: white;">unedited</option>
+                                    <option value="completed" style="background-color: lightgreen;">completed</option>
+                                    <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                    <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                    <option value="late" style="background-color: red;">late</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select name="kasambahay_{{ selected_barang.id }}" class="form-select"
+                                {% if selected_barang.kasambahay == "completed" %}
+                                style="background-color: lightgreen; font-weight: bold;"
+                                {% elif selected_barang.kasambahay == "incomplete" %}
+                                style="background-color: cyan; font-weight: bold;"
+                                {% elif selected_barang.kasambahay == "unsubmitted" %}
+                                style="background-color: orange; font-weight: bold;"
+                                {% elif selected_barang.kasambahay == "late" %}
+                                style="background-color: red; font-weight: bold;"
+                                {% endif %} onchange="updateSelectColor(this)">
+                                    <option value="{{ selected_barang.kasambahay }}" selected>{{ selected_barang.kasambahay }}</option>
+                                    <option value="unedited" style="background-color: white;">unedited</option>
+                                    <option value="completed" style="background-color: lightgreen;">completed</option>
+                                    <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                    <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                    <option value="late" style="background-color: red;">late</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-responsive mt-4">
+                <table id="table-job-bfdp-kasambahay" class="table table-bordered table-striped text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th colspan="5">Road Clearing</th>
+                        </tr>
+                        <tr>
+                            <th>Week 1</th>
+                            <th>Week 2</th>
+                            <th>Week 3</th>
+                            <th>Week 4</th>
+                            <th>Week 5</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            {% for week in range(1, 6) %}
+                            <td>
+                                <select name="manila_bay_w{{ week }}_{{ selected_barang.id }}" class="form-select"
+                                {% if selected_barang['manila_bay_w' ~ week] == "completed" %}
+                                style="background-color: lightgreen; font-weight: bold;"
+                                {% elif selected_barang['manila_bay_w' ~ week] == "incomplete" %}
+                                style="background-color: cyan; font-weight: bold;"
+                                {% elif selected_barang['manila_bay_w' ~ week] == "unsubmitted" %}
+                                style="background-color: orange; font-weight: bold;"
+                                {% elif selected_barang['manila_bay_w' ~ week] == "late" %}
+                                style="background-color: red; font-weight: bold;"
+                                {% endif %} onchange="updateSelectColor(this)">
+                                    <option value="{{ selected_barang['manila_bay_w' ~ week] }}" selected>{{ selected_barang['manila_bay_w' ~ week] }}</option>
+                                    <option value="unedited" style="background-color: white;">unedited</option>
+                                    <option value="completed" style="background-color: lightgreen;">completed</option>
+                                    <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                    <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                    <option value="late" style="background-color: red;">late</option>
+                                </select>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-responsive mt-4">
+                <table id="table-job-bfdp-kasambahay" class="table table-bordered table-striped text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th colspan="5">Road Clearing</th>
+                        </tr>
+                        <tr>
+                            <th>Week 1</th>
+                            <th>Week 2</th>
+                            <th>Week 3</th>
+                            <th>Week 4</th>
+                            <th>Week 5</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            {% for week in range(1, 6) %}
+                            <td>
+                                <select name="kalinisan_w{{ week }}_{{ selected_barang.id }}" class="form-select"
+                                {% if selected_barang['kalinisan_w' ~ week] == "completed" %}
+                                style="background-color: lightgreen; font-weight: bold;"
+                                {% elif selected_barang['kalinisan_w' ~ week] == "incomplete" %}
+                                style="background-color: cyan; font-weight: bold;"
+                                {% elif selected_barang['kalinisan_w' ~ week] == "unsubmitted" %}
+                                style="background-color: orange; font-weight: bold;"
+                                {% elif selected_barang['kalinisan_w' ~ week] == "late" %}
+                                style="background-color: red; font-weight: bold;"
+                                {% endif %} onchange="updateSelectColor(this)">
+                                    <option value="{{ selected_barang['kalinisan_w' ~ week] }}" selected>{{ selected_barang['kalinisan_w' ~ week] }}</option>
+                                    <option value="unedited" style="background-color: white;">unedited</option>
+                                    <option value="completed" style="background-color: lightgreen;">completed</option>
+                                    <option value="incomplete" style="background-color: cyan;">incomplete</option>
+                                    <option value="unsubmitted" style="background-color: orange;">unsubmitted</option>
+                                    <option value="late" style="background-color: red;">late</option>
+                                </select>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+    

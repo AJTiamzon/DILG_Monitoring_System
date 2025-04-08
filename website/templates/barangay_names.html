@@ -1,0 +1,12 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+    %}
+    <h1 align="center">Barangay Names</h1>
+    <ul class="list-group list-group-flush" id="notes">
+      {% for name in barangay_names %}
+      <li class="list-group-item"> 
+        {{ name.barang_name }}
+      </li>
+      {% endfor %}
+    </ul>
+    {% endblock %}
+    
