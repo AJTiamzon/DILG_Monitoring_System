@@ -1,29 +1,63 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
-from . import db   ##means from __init__.py import db
+from . import db, mail   ##means from __init__.py import db
 from flask_login import login_user, login_required, logout_user, current_user
 
 
 auth = Blueprint('auth', __name__)
 
 
+from flask_mail import Message
+import random
+from datetime import datetime, timedelta
+from flask import session
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
+        action = request.form.get('action')
 
-        user = User.query.filter_by(email=email).first()
-        if user:
-            if check_password_hash(user.password, password):
-                flash('Logged in successfully!', category='success')
-                login_user(user, remember=True)
-                return redirect(url_for('views.home'))
+        if action == 'request':
+            # Generate and send new OTP
+            otp_code = str(random.randint(100000, 999999))
+            session['otp_code'] = otp_code
+            session['otp_timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+            msg = Message(subject='Your OTP Code',
+                          sender='youremail@gmail.com',
+                          recipients=['adrianjennelltiamzon@gmail.com'])
+            msg.body = f'Your OTP code is: {otp_code}\n\nIt expires in 5 minutes.'
+            mail.send(msg)
+
+            flash("OTP sent to boss email. It will expire in 5 minutes.", category="info")
+
+        elif action == 'submit':
+            input_otp = request.form.get('otp')
+
+            stored_otp = session.get('otp_code')
+            otp_time = session.get('otp_timestamp')
+
+            if stored_otp and otp_time:
+                otp_time = datetime.strptime(otp_time, "%Y-%m-%d %H:%M:%S")
+                now = datetime.now()
+
+                if now - otp_time > timedelta(minutes=5):
+                    flash("OTP has expired. Please request a new one.", category="error")
+                    session.pop('otp_code', None)
+                    session.pop('otp_timestamp', None)
+                elif input_otp == stored_otp:
+                    user = User.query.filter_by(email='adrianjennelltiamzon@gmail.com').first()
+                    login_user(user, remember=True)
+                    session.permanent = True
+                    flash("Logged in successfully with OTP.", category="success")
+                    session.pop('otp_code', None)
+                    session.pop('otp_timestamp', None)
+                    return redirect(url_for('views.home'))
+                else:
+                    flash("Invalid OTP. Please try again.", category="error")
             else:
-                flash('Incorrect password, try again.', category='error')
-        else:
-            flash('Email does not exist.', category='error')
+                flash("No OTP found. Please request one first.", category="error")
 
     return render_template("login.html", user=current_user)
 
@@ -32,6 +66,12 @@ def login():
 @login_required
 def logout():
     logout_user()
+
+    # Clear OTP session data
+    session.pop('otp_code', None)
+    session.pop('otp_timestamp', None)
+
+    flash("You have been logged out. Please request a new OTP to log in again.", category="info")
     return redirect(url_for('auth.login'))
 
 

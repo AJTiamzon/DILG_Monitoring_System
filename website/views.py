@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, flash, jsonify, url_for, redirect
 from flask_login import login_required, current_user
-from .models import db, Note, Barangay_Names, Brngy_files3
+from .models import db, Note, Barangay_Names, Brngy_files4, SubjectLinks3
+from sqlalchemy import distinct, func
 import json
 
 views = Blueprint('views', __name__)
@@ -12,9 +13,8 @@ def home():
     if request.method == 'POST': 
         note = request.form.get('note')#Gets the note from the HTML 
         
-
         if len(note) < 1:
-            flash('Note is too short!', category='error') 
+            flash('Note is too short!', category='error')
         else:
             new_note = Note(data=note, user_id=current_user.id)  #providing the schema for the note 
             db.session.add(new_note) #adding the note to the database 
@@ -25,19 +25,28 @@ def home():
 
 
 @views.route('/create_barang', methods=['POST', 'GET'])
+@login_required
 def create_barang():
     if request.method == 'POST':
         barang_names = Barangay_Names.query.all()  # Get all barangay names
         added_by = request.form.get('added_by')
-        year = request.form.get('year')
+        year = int(request.form.get('year'))
         month = request.form.get('month')
+        creating_record = Brngy_files4.query.filter_by(year=year, month=month).first()
 
         if not added_by or not month or not year:
-            flash('Fill Out All Fields!', category='danger')
+            flash('Fill Out All Fields!', category='error')
+
+        elif not isinstance(year, int) and year < 2020:
+            flash('Year Must Be A Number And At Least 2020!', category='error')
+        
+        elif creating_record:
+            flash('Record Already Exists', category='error')
+
         else:
             barang_entries = []  # Store all entries first
             for name in barang_names:
-                new_barang_month = Brngy_files3(
+                new_barang_month = Brngy_files4(
                     barang_name=name.barang_name,  # Correct way to access name
                     added_by=added_by, 
                     year=year, 
@@ -61,8 +70,9 @@ def create_barang():
     return render_template("create_barang.html", user=current_user)
 
 @views.route('/barang_list', methods=['POST', 'GET'])
+@login_required
 def barang_list():
-    barang_files = Brngy_files3.query.all()
+    barang_files = Brngy_files4.query.all()
 
     # Collecting the year dates
     barang_years1 = []
@@ -74,7 +84,7 @@ def barang_list():
     if request.method == 'POST':
         for barangay in barang_files:
             barangay_id = barangay.id
-            barangay_to_update = Brngy_files3.query.get(barangay_id)
+            barangay_to_update = Brngy_files4.query.get(barangay_id)
 
             if barangay_to_update:
                 # Retrieve form data with fallback to existing values
@@ -93,12 +103,12 @@ def barang_list():
         db.session.commit()
         flash('Barangay details updated successfully!', category='success')
         return redirect(url_for("views.barang_list"))
-
     return render_template("barangay_list.html", user=current_user, barang_files=barang_files, barang_years1=barang_years1)
 
 @views.route('/find_barangay', methods=['POST', 'GET'])
+@login_required
 def find_barangay():
-    barang_files = Brngy_files3.query.all()
+    barang_files = Brngy_files4.query.all()
     barang_names = Barangay_Names.query.all()
 
     barang_years1 = []
@@ -111,7 +121,7 @@ def find_barangay():
         month = request.form.get('barangay_month')
         barangay = request.form.get('barangay_name')
 
-        selected_barang = Brngy_files3.query.filter_by(year=year, month=month, barang_name=barangay).first()
+        selected_barang = Brngy_files4.query.filter_by(year=year, month=month, barang_name=barangay).first()
 
         return render_template("find_barangay.html", user=current_user, barang_years1=barang_years1, barang_names=barang_names, selected_barang=selected_barang)
 
@@ -121,7 +131,7 @@ def find_barangay():
 @login_required
 def barangay_charts():
     #Store the required information into variables
-    barang_files = Brngy_files3.query.all()
+    barang_files = Brngy_files4.query.all()
     barangay_names = Barangay_Names.query.all()
     
     #Setup the months to be used and get the user inputs for whih specific year and month
@@ -134,7 +144,7 @@ def barangay_charts():
 
     #Get all of the barangays with the specified month and year
     if year_req and month_req:
-        filtered_barangays = Brngy_files3.query.filter_by(year=year_req, month=month_req).all()
+        filtered_barangays = Brngy_files4.query.filter_by(year=year_req, month=month_req).all()
     else:
         filtered_barangays = []
 
@@ -173,6 +183,85 @@ def barangay_charts():
                            months=months,
                            barangay_chart_data=barangay_chart_data)
 
+@views.route('/barangay_creation_records', methods=['GET', 'POST'])
+@login_required
+def barangay_creation_records():
+    # Get distinct month-year pairs
+    subquery = (
+        db.session.query(
+            Brngy_files4.month,
+            Brngy_files4.year,
+            func.min(Brngy_files4.id).label("min_id")
+        )
+        .group_by(Brngy_files4.month, Brngy_files4.year)
+        .subquery()
+    )
+
+    barang_files = (
+        db.session.query(Brngy_files4)
+        .join(subquery, Brngy_files4.id == subquery.c.min_id)
+        .order_by(Brngy_files4.date.desc())  # This line does the magic
+        .all()
+    )
+    return render_template("barangay_creation_records.html", user=current_user, barang_files=barang_files)
+
+@views.route('/barangay_link', methods=['GET', 'POST'])
+def barangay_link():
+    barangay_names = Barangay_Names.query.all()
+    fields_to_check = [
+        "road_clearing", "kp", "vawc", "first_time_job_seeking",
+        "bfdp", "kasambahay", "manila_bay_w1", "manila_bay_w2",
+        "manila_bay_w3", "manila_bay_w4", "manila_bay_w5", "kalinisan_w1",
+        "kalinisan_w2", "kalinisan_w3", "kalinisan_w4", "kalinisan_w5"
+    ]
+
+    barangay_status = None
+    submitted_links = []
+
+    if request.method == 'POST':
+        barang_name = request.form.get('name')
+        subject = request.form.get('subject')
+        link = request.form.get('link')
+        month = request.form.get('month')
+        year = request.form.get('year')
+        added_by = current_user.first_name
+
+        barang_to_edit = Brngy_files4.query.filter_by(
+            year=year, month=month, barang_name=barang_name
+        ).first()
+
+        if barang_to_edit:
+            existing_link = SubjectLinks3.query.filter_by(year=year, month=month, subject=subject, 
+                                                          barangay_id = barang_to_edit.id).first()
+            
+            if existing_link:
+                existing_link.link = link
+                existing_link.added_by = added_by
+                flash('Link Succesfully Updated', category='success')
+                
+            else:
+                link_to_submit = SubjectLinks3(
+                    year=year,
+                    month=month,
+                    subject=subject,
+                    link=link,
+                    added_by=added_by,
+                    barangay=barang_to_edit
+                )
+                db.session.add(link_to_submit)
+                flash('Link Submitted Succesfully', category='success')
+
+                for field in fields_to_check:
+                    if field == subject:
+                        setattr(barang_to_edit, field, 'submitted')
+
+            db.session.commit()
+        else:
+            flash('That Month Has Not Yet Been Added, Please Make Sure To Input Proper Barangay Name, Year And Month', category='error')
+
+    return render_template(
+        "barangay_link.html",user=current_user,barangay_names=barangay_names,submitted_links=submitted_links)
+
 @views.route('/barangay_names', methods=['GET', 'POST'])
 @login_required
 def barangay_names():
@@ -183,8 +272,10 @@ def barangay_names():
 ############################################### Routes ####################################################################
 
 @views.route('/find_barangay_year_month', methods=['POST', 'GET'])
+@login_required
 def find_barangay_year_month():
-    barang_files = Brngy_files3.query.all()
+    barang_files = Brngy_files4.query.all()
+    # barang_links = SubjectLinks3.query.all()
 
     barang_years1 = []
     for barang in barang_files:
@@ -194,21 +285,23 @@ def find_barangay_year_month():
     if request.method == 'POST':
         year = request.form.get('barangay_year')
         month = request.form.get('barangay_month')
+        barang_links = SubjectLinks3.query.filter_by(year=year, month=month).all()
 
-        month_year_list = Brngy_files3.query.filter_by(year=year, month=month).all()
+        month_year_list = Brngy_files4.query.filter_by(year=year, month=month).all()
 
-        return render_template("barangay_list.html", user=current_user, barang_years1=barang_years1, barang_files=barang_files, month_year_list=month_year_list)
+        return render_template("barangay_list.html", user=current_user, barang_years1=barang_years1, barang_files=barang_files, month_year_list=month_year_list, barang_links=barang_links)
 
-    return render_template("barangay_list.html", user=current_user, barang_years1=barang_years1, barang_files=barang_files)
+    return render_template("barangay_list.html", user=current_user, barang_years1=barang_years1, barang_files=barang_files, barang_links=barang_links)
 
 @views.route('/find_barangay_save_changes', methods=['POST'])
+@login_required
 def find_barangay_save_changes():
     if request.method == 'POST':
         year = request.form.get('selected_barang_year')
         month = request.form.get('selected_barang_month')
         barang_name = request.form.get('selected_barang_name')
 
-        barangay_to_edit = Brngy_files3.query.filter_by(year=year, month=month, barang_name=barang_name).first()
+        barangay_to_edit = Brngy_files4.query.filter_by(year=year, month=month, barang_name=barang_name).first()
 
         # Check if a matching record is found
         if not barangay_to_edit:
@@ -232,7 +325,7 @@ def find_barangay_save_changes():
         db.session.commit()
 
         # Fetch updated data and render the template with the selected barangay
-        barang_files = Brngy_files3.query.all()
+        barang_files = Brngy_files4.query.all()
         barang_names = Barangay_Names.query.all()
 
         barang_years1 = list(set([barang.year for barang in barang_files]))
@@ -242,6 +335,7 @@ def find_barangay_save_changes():
     return redirect(url_for('views.find_barangay'))
 
 @views.route('/delete-note', methods=['POST'])
+@login_required
 def delete_note():  
     note = json.loads(request.data) # this function expects a JSON from the INDEX.js file 
     noteId = note['noteId']
@@ -254,18 +348,28 @@ def delete_note():
     return jsonify({})
 
 @views.route('/delete_barangay', methods=['POST'])
+@login_required
 def delete_barangay():
-    barang_id = request.form.get('barang_id')
+    year = request.form.get('year')
+    month = request.form.get('month')
 
-    if barang_id:
-        barang = Brngy_files3.query.get(barang_id)
-        if barang:
-            db.session.delete(barang)
+    if year and month:
+        barang_list = Brngy_files4.query.filter_by(year=year, month=month).all()
+        if barang_list:
+            for barang in barang_list:
+                # Delete associated SubjectLinks3 records first
+                subject_links = SubjectLinks3.query.filter_by(barangay_id=barang.id).all()
+                for link in subject_links:
+                    db.session.delete(link)
+                
+                # Then delete the barangay entry
+                db.session.delete(barang)
+
             db.session.commit()
-            flash('Barangay deleted successfully!', category='success')
+            flash('All barangay records and their links for that month deleted successfully!', category='success')
         else:
-            flash('Barangay not found!', category='danger')
+            flash('No barangay records found for that month!', category='danger')
     else:
         flash('Invalid request!', category='danger')
 
-    return redirect(url_for("views.barang_list"))
+    return redirect(url_for("views.barangay_creation_records"))
