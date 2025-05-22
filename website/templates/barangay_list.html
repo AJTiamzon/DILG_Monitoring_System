@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Barangay List{% endblock %}
 {% block content %}
+    <style>
+        td{
+            font-weight: bold;
+        }
+    </style>
 
     <div class="card shadow">
         <div class="card-header text-center bg-info text-black font-weight-bold">
@@ -9,7 +14,7 @@
 
             <form method="POST" action="/find_barangay_year_month">
                 <label for="barangay_year">Select Year</label>
-                <select name="barangay_year" id="barangay_year">
+                <select name="barangay_year" id="barangay_year" required>
                     <option value="2025" selected>2025</option>
                     {% for year in barang_years1 %}
                     <option value="{{ year }}">{{ year }}</option>
@@ -17,7 +22,7 @@
                 </select>
     
                 <label for="barangay_year">Select Month</label>
-                <select name="barangay_month" id="barangay_month">
+                <select name="barangay_month" id="barangay_month" required>
                     <option value="January">January</option>
                     <option value="February">February</option>
                     <option value="March">March</option>
@@ -68,7 +73,18 @@
                             {% if month_year_list %}
                             {% for data in month_year_list %}
                             <tr>
-                                <td>{{ data.barang_name }}</td>
+                                <td>{{ data.barang_name }} 
+                                    <button class="btn btn-info" type="button" onclick = "link_road_kp_vawc('link_{{ data.barang_name }}')">View Links</button>
+                                    <div id="link_{{ data.barang_name }}" style="display:none;">
+                                        <h4>Submitted Links:</h4>
+                                        {% for link in barang_links %}
+                                            {% if link.barangay_id == data.id and link.year == data.year and link.month == data.month%}
+                                                <h6>{{ link.subject }}: <a href="{{ link.link }}" target="_blank">Click To Open Link</a></h6>
+                                                <h6>Submitted By: {{ link.added_by }}</h6>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </td>
                                 <td>{{ data.added_by }}</td>
                                 <td>{{ data.year }}</td>
                                 <td>{{ data.month }}</td>
@@ -82,6 +98,8 @@
                                     style="background-color: orange; font-weight: bold;"
                                     {% elif data.road_clearing == "late" %}
                                     style="background-color: red; font-weight: bold;"
+                                    {% elif data.road_clearing == "submitted" %}
+                                    style="background-color: yellow; font-weight: bold;"
                                     {% endif %} onchange="updateSelectColor(this)">
                                         <option value="{{ data.road_clearing }}" selected>{{ data.road_clearing }}</option>
                                         <option value="unedited" style="background-color: white;">unedited</option>
@@ -101,6 +119,8 @@
                                     style="background-color: orange; font-weight: bold;"
                                     {% elif data.kp == "late" %}
                                     style="background-color: red; font-weight: bold;"
+                                    {% elif data.kp == "submitted" %}
+                                    style="background-color: yellow; font-weight: bold;"
                                     {% endif %} onchange="updateSelectColor(this)">
                                         <option value="{{ data.kp }}" selected>{{ data.kp }}</option>
                                         <option value="unedited" style="background-color: white;">unedited</option>
@@ -120,6 +140,8 @@
                                     style="background-color: orange; font-weight: bold;"
                                     {% elif data.vawc == "late" %}
                                     style="background-color: red; font-weight: bold;"
+                                    {% elif data.vawc == "submitted" %}
+                                    style="background-color: yellow; font-weight: bold;"
                                     {% endif %} onchange="updateSelectColor(this)">
                                         <option value="{{ data.vawc }}" selected>{{ data.vawc }}</option>
                                         <option value="unedited" style="background-color: white;">unedited</option>
@@ -138,7 +160,7 @@
 
                 <!-- Second Table -->
                 <div class="table-responsive mt-4">
-                    <table id="table-job-bfdp-kasambahay" class="table table-bordered table-striped text-center" style="">
+                    <table id="table-job-bfdp-kasambahay" class="table table-bordered table-striped text-center" style ="">
                         <thead class="table-dark">
                             <tr>
                                 <th>Barangay Name</th>
@@ -168,6 +190,8 @@
                                     style="background-color: orange; font-weight: bold;"
                                     {% elif data.first_time_job_seeking == "late" %}
                                     style="background-color: red; font-weight: bold;"
+                                    {% elif data.first_time_job_seeking == "submitted" %}
+                                    style="background-color: yellow; font-weight: bold;"
                                     {% endif %} onchange="updateSelectColor(this)">
                                         <option value="{{ data.first_time_job_seeking }}" selected>{{ data.first_time_job_seeking }}</option>
                                         <option value="unedited" style="background-color: white;">unedited</option>
@@ -187,6 +211,8 @@
                                     style="background-color: orange; font-weight: bold;"
                                     {% elif data.bfdp == "late" %}
                                     style="background-color: red; font-weight: bold;"
+                                    {% elif data.bfdp == "submitted" %}
+                                    style="background-color: yellow; font-weight: bold;"
                                     {% endif %} onchange="updateSelectColor(this)">
                                         <option value="{{ data.bfdp }}" selected>{{ data.bfdp }}</option>
                                         <option value="unedited" style="background-color: white;">unedited</option>
@@ -206,6 +232,8 @@
                                     style="background-color: orange; font-weight: bold;"
                                     {% elif data.kasambahay == "late" %}
                                     style="background-color: red; font-weight: bold;"
+                                    {% elif data.kasambahay == "submitted" %}
+                                    style="background-color: yellow; font-weight: bold;"
                                     {% endif %} onchange="updateSelectColor(this)">
                                         <option value="{{ data.kasambahay }}" selected>{{ data.kasambahay }}</option>
                                         <option value="unedited" style="background-color: white;">unedited</option>
@@ -261,6 +289,8 @@
                                     style="background-color: orange; font-weight: bold;"
                                     {% elif data['manila_bay_w' ~ week] == "late" %}
                                     style="background-color: red; font-weight: bold;"
+                                    {% elif data['manila_bay_w' ~ week] == "submitted" %}
+                                    style="background-color: yellow; font-weight: bold;"
                                     {% endif %} onchange="updateSelectColor(this)">
                                         <option value="{{ data['manila_bay_w' ~ week] }}" selected>{{ data['manila_bay_w' ~ week] }}</option>
                                         <option value="unedited" style="background-color: white;">unedited</option>
@@ -317,6 +347,8 @@
                                     style="background-color: orange; font-weight: bold;"
                                     {% elif data['kalinisan_w' ~ week] == "late" %}
                                     style="background-color: red; font-weight: bold;"
+                                    {% elif data['kalinisan_w' ~ week] == "submitted" %}
+                                    style="background-color: yellow; font-weight: bold;"
                                     {% endif %} onchange="updateSelectColor(this)">
                                         <option value="{{ data['kalinisan_w' ~ week] }}" selected>{{ data['kalinisan_w' ~ week] }}</option>
                                         <option value="unedited" style="background-color: white;">unedited</option>
@@ -338,4 +370,83 @@
         </div>
     </div>
 
+{% endblock %}
+{% block javascript %}
+    <script>
+        function link_road_kp_vawc(id) {
+            var x = document.getElementById(id)
+            if (x.style.display === "none"){
+                x.style.display = ""
+            } else {
+                x.style.display = "none"
+            }
+        }
+
+        function table_road_kp_vawc() {
+            var x = document.getElementById("table-road-kp-vawc")
+            var y = document.getElementById("table-road-kp-vawc-btn")
+            if (x.style.display === "" && y.style.backgroundColor === "cyan"){
+                x.style.display = "none"
+                y.style.backgroundColor = "yellow"
+            } else {
+                x.style.display = ""
+                y.style.backgroundColor = "cyan"
+            }
+        }
+
+        function table_manila_bay() {
+        var x = document.getElementById("table-manila-bay")
+        var y = document.getElementById("table-manila-bay-btn")
+        if (x.style.display === "" && y.style.backgroundColor === "cyan"){
+            x.style.display = "none"
+            y.style.backgroundColor = "yellow"
+        } else {
+            x.style.display = ""
+            y.style.backgroundColor = "cyan"
+        }
+        }
+
+        function table_job_bfdp_kasambahay() {
+        var x = document.getElementById("table-job-bfdp-kasambahay")
+        var y = document.getElementById("table-job-bfdp-kasambahay-btn")
+        if (x.style.display === "" && y.style.backgroundColor === "cyan"){
+            x.style.display = "none"
+            y.style.backgroundColor = "yellow"
+        } else {
+            x.style.display = ""
+            y.style.backgroundColor = "cyan"
+        }
+        }
+
+        function table_kalinisan() {
+        var x = document.getElementById("table-kalinisan")
+        var y = document.getElementById("table-kalinisan-btn")
+        if (x.style.display === "" && y.style.backgroundColor === "cyan"){
+            x.style.display = "none"
+            y.style.backgroundColor = "yellow"
+        } else {
+            x.style.display = ""
+            y.style.backgroundColor = "cyan"
+        }
+        }
+
+        function updateSelectColor(selectElement) {
+            // Get the selected option value
+            let selectedValue = selectElement.value;
+
+            // Define color mapping
+            let colors = {
+                "completed": "lightgreen",
+                "incomplete": "cyan",
+                "unsubmitted": "orange",
+                "late": "red",
+                "unedited": "white",
+                "submitted": "yellow"
+            };
+
+            // Apply background color based on selection
+            selectElement.style.backgroundColor = colors[selectedValue] || "white";
+            selectElement.style.fontWeight = "bold"; // Make text bold for better visibility
+        }
+    </script>
 {% endblock %}

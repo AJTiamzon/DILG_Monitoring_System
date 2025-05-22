@@ -46,11 +46,11 @@
         <form action="/find_barangay_save_changes" method="POST">
             <div class="d-flex justify-content-between">
                 <h3>Year: {{ selected_barang.year }}</h3>
-                <input type="hidden" name="selected_barang_year" id="" value="{{ selected_barang.year }}">
+                <input type="hidden" name="selected_barang_year" id="" value="{{ selected_barang.year }}" required>
                 <h3>Month: {{ selected_barang.month }}</h3>
-                <input type="hidden" name="selected_barang_month" id="" value="{{ selected_barang.month }}">
+                <input type="hidden" name="selected_barang_month" id="" value="{{ selected_barang.month }}" required>
                 <h3>Barangay: {{ selected_barang.barang_name }}</h3>
-                <input type="hidden" name="selected_barang_name" id="" value="{{ selected_barang.barang_name }}">
+                <input type="hidden" name="selected_barang_name" id="" value="{{ selected_barang.barang_name }}" required>
                 <button class="btn btn-success" type="submit">Save Changes</button>
                 <a href="/find_barangay" class="btn btn-primary">Refresh</a>
             </div>
@@ -78,6 +78,8 @@
                                 style="background-color: orange; font-weight: bold;"
                                 {% elif selected_barang.road_clearing == "late" %}
                                 style="background-color: red; font-weight: bold;"
+                                {% elif selected_barang.road_clearing == "submitted" %}
+                                style="background-color: yellow; font-weight: bold;"
                                 {% endif %} onchange="updateSelectColor(this)">
                                     <option value="{{ selected_barang.road_clearing }}" selected>{{ selected_barang.road_clearing }}</option>
                                     <option value="unedited" style="background-color: white;">unedited</option>
@@ -97,6 +99,8 @@
                                 style="background-color: orange; font-weight: bold;"
                                 {% elif selected_barang.kp == "late" %}
                                 style="background-color: red; font-weight: bold;"
+                                {% elif selected_barang.kp == "submitted" %}
+                                style="background-color: yellow; font-weight: bold;"
                                 {% endif %} onchange="updateSelectColor(this)">
                                     <option value="{{ selected_barang.kp }}" selected>{{ selected_barang.kp }}</option>
                                     <option value="unedited" style="background-color: white;">unedited</option>
@@ -116,6 +120,8 @@
                                 style="background-color: orange; font-weight: bold;"
                                 {% elif selected_barang.vawc == "late" %}
                                 style="background-color: red; font-weight: bold;"
+                                {% elif selected_barang.vawc == "submitted" %}
+                                style="background-color: yellow; font-weight: bold;"
                                 {% endif %} onchange="updateSelectColor(this)">
                                     <option value="{{ selected_barang.vawc }}" selected>{{ selected_barang.vawc }}</option>
                                     <option value="unedited" style="background-color: white;">unedited</option>
@@ -135,6 +141,8 @@
                                 style="background-color: orange; font-weight: bold;"
                                 {% elif selected_barang.first_time_job_seeking == "late" %}
                                 style="background-color: red; font-weight: bold;"
+                                {% elif selected_barang.first_time_job_seeking == "submitted" %}
+                                style="background-color: yellow; font-weight: bold;"
                                 {% endif %} onchange="updateSelectColor(this)">
                                     <option value="{{ selected_barang.first_time_job_seeking }}" selected>{{ selected_barang.first_time_job_seeking }}</option>
                                     <option value="unedited" style="background-color: white;">unedited</option>
@@ -154,6 +162,8 @@
                                 style="background-color: orange; font-weight: bold;"
                                 {% elif selected_barang.bfdp == "late" %}
                                 style="background-color: red; font-weight: bold;"
+                                {% elif selected_barang.bfdp == "submitted" %}
+                                style="background-color: yellow; font-weight: bold;"
                                 {% endif %} onchange="updateSelectColor(this)">
                                     <option value="{{ selected_barang.bfdp }}" selected>{{ selected_barang.bfdp }}</option>
                                     <option value="unedited" style="background-color: white;">unedited</option>
@@ -173,6 +183,8 @@
                                 style="background-color: orange; font-weight: bold;"
                                 {% elif selected_barang.kasambahay == "late" %}
                                 style="background-color: red; font-weight: bold;"
+                                {% elif selected_barang.kasambahay == "submitted" %}
+                                style="background-color: yellow; font-weight: bold;"
                                 {% endif %} onchange="updateSelectColor(this)">
                                     <option value="{{ selected_barang.kasambahay }}" selected>{{ selected_barang.kasambahay }}</option>
                                     <option value="unedited" style="background-color: white;">unedited</option>
@@ -191,7 +203,7 @@
                 <table id="table-job-bfdp-kasambahay" class="table table-bordered table-striped text-center">
                     <thead class="table-dark">
                         <tr>
-                            <th colspan="5">Road Clearing</th>
+                            <th colspan="5">Manila Bay</th>
                         </tr>
                         <tr>
                             <th>Week 1</th>
@@ -214,6 +226,8 @@
                                 style="background-color: orange; font-weight: bold;"
                                 {% elif selected_barang['manila_bay_w' ~ week] == "late" %}
                                 style="background-color: red; font-weight: bold;"
+                                {% elif selected_barang['manila_bay_w' ~ week] == "submitted" %}
+                                style="background-color: yellow; font-weight: bold;"
                                 {% endif %} onchange="updateSelectColor(this)">
                                     <option value="{{ selected_barang['manila_bay_w' ~ week] }}" selected>{{ selected_barang['manila_bay_w' ~ week] }}</option>
                                     <option value="unedited" style="background-color: white;">unedited</option>
@@ -233,7 +247,7 @@
                 <table id="table-job-bfdp-kasambahay" class="table table-bordered table-striped text-center">
                     <thead class="table-dark">
                         <tr>
-                            <th colspan="5">Road Clearing</th>
+                            <th colspan="5">Kalinisan</th>
                         </tr>
                         <tr>
                             <th>Week 1</th>
@@ -256,6 +270,8 @@
                                 style="background-color: orange; font-weight: bold;"
                                 {% elif selected_barang['kalinisan_w' ~ week] == "late" %}
                                 style="background-color: red; font-weight: bold;"
+                                {% elif selected_barang['kalinisan_w' ~ week] == "submitted" %}
+                                style="background-color: yellow; font-weight: bold;"
                                 {% endif %} onchange="updateSelectColor(this)">
                                     <option value="{{ selected_barang['kalinisan_w' ~ week] }}" selected>{{ selected_barang['kalinisan_w' ~ week] }}</option>
                                     <option value="unedited" style="background-color: white;">unedited</option>

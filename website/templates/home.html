@@ -3,10 +3,19 @@
 
 {% block head %}
 <style>
-  
+  .card{
+    width: 100%;
+  }
+
+  @media (min-width: 1400px){ 
+    .card {
+      margin-top: 7%;
+      width: 110%;
+    }
+  }
 </style>
 {% endblock %}
-<div class="card shadow" style="width: 100%;">
+<div class="card shadow">
   <div class="card-header bg-info text-black font-weight-bold">
 
     <h1>Notes For Everyone:</h1>

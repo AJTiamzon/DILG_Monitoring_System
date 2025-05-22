@@ -1,0 +1,94 @@
+{% extends "base.html" %} {% block title %}Home{% endblock %} {% block content
+    %}
+    <style>
+      .card{
+        width: 100%;
+      }
+    
+      @media (min-width: 1400px){ 
+        .card {
+          margin-top: 7%;
+          width: 110%;
+        }
+      }
+    </style>
+    <div class="card shadow">
+      <div class="card-header bg-info text-black font-weight-bold">
+    
+        <h1>Submit File Links:</h1>
+    
+      </div>
+    
+          <div class="card-body">
+    
+            <div class="d-flex justify-content-center">
+              <div class="card shadow" style="width: 60%;">
+                <div class="card-body">
+
+                  <form method="POST" >
+                    <label for="name">Barngay Name</label>
+                    <select name="name" id="name" class="form-control" required>
+                      {% for barang in barangay_names %}
+                      <option value="{{ barang.barang_name }}">{{ barang.barang_name }}</option>
+                      {% endfor %}
+                    </select>
+
+                    <label for="subject">Subject Type</label>
+                    <select name="subject" id="subject" class="form-control" required>
+                      <option value="road_clearing">Road Clearing</option>
+                      <option value="kp">KP</option>
+                      <option value="vawc">VAWC</option>
+                      <option value="first_time_job_seeking">First Time Job Seeking</option>
+                      <option value="bfdp">BFDP</option>
+                      <option value="kasambahay">Kasambahay</option>
+                      <option value="manila_bay_w1">Manila Bay W1</option>
+                      <option value="manila_bay_w2">Manila Bay W2</option>
+                      <option value="manila_bay_w3">Manila Bay W3</option>
+                      <option value="manila_bay_w4">Manila Bay W4</option>
+                      <option value="manila_bay_w5">Manila Bay W5</option>
+                      <option value="kalinisan_w1">Kalinisan W1</option>
+                      <option value="kalinisan_w2">Kalinisan W2</option>
+                      <option value="kalinisan_w3">Kalinisan W3</option>
+                      <option value="kalinisan_w4">Kalinisan W4</option>
+                      <option value="kalinisan_w5">Kalinisan W5</option>
+                    </select>
+
+                    <label for="month">Month</label>
+                    <select name="month" id="month" class="form-control" required>
+                      <option value="January">January</option>
+                      <option value="February">February</option>
+                      <option value="March">March</option>
+                      <option value="April">April</option>
+                      <option value="May">May</option>
+                      <option value="June">June</option>
+                      <option value="July">July</option>
+                      <option value="August">August</option>
+                      <option value="September">September</option>
+                      <option value="October">October</option>
+                      <option value="November">November</option>
+                      <option value="December">December</option>
+                    </select>
+
+                    <label for="year" class="form-label">Year:</label>
+                    <input type="number" class="form-control" id="year" name="year" min="2025" placeholder="2025"  required>
+
+                    <br>
+
+                    <label for="link">Link of Documents:</label>
+                    <input type="text" name="link" id="link" class="form-control" required>
+
+                    <br />
+                    <div align="center">
+                      <button type="submit" class="btn btn-primary">Submit Link</button>
+                    </div>
+                  </form>
+
+                </div>
+              </div>
+            </div>
+            
+        </div>
+    
+    </div>
+    {% endblock %}
+    

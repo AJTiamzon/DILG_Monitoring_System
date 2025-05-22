@@ -26,14 +26,14 @@
         <h1 align="center">Barangay Report Charts</h1>
         <form method="POST">
             <label for="year_req">Select Year:</label>
-            <select name="year_req" id="year_req">
+            <select name="year_req" id="year_req"  required>
                 {% for year in barang_years1 %}
                 <option value="{{ year }}">{{ year }}</option>
                 {% endfor %}
             </select>
 
             <label for="month_req">Select Month:</label>
-            <select name="month_req" id="month_req">
+            <select name="month_req" id="month_req" required>
                 {% for month in months %}
                 <option value="{{ month }}">{{ month }}</option>
                 {% endfor %}

@@ -46,11 +46,10 @@
 
       .side-bar{
         position: fixed; /* Keep it fixed so it doesn’t scroll away */
-        top: 10;
+        top: 2%;  
         left: 0;
         width: 15%; /* Keep this consistent */
         height: 100vh; /* Make it take the full height */
-        background-image: url(https://i.pinimg.com/474x/51/4b/96/514b96d37dd70229b2b6d4f708985687.jpg);
         background-repeat:no-repeat;
         background-size:100% 100%;
         padding-top: 50px;
@@ -72,7 +71,7 @@
         transition: transform 0.2s ease-in-out; /* Smooth hover effect */
         display: inline-block; /* Ensures smooth scaling */
         text-align: center;
-        margin-top: 4%;
+        margin-top: 10%;
         margin-bottom: 4%;
         margin-left: 8%;
       }
@@ -90,12 +89,31 @@
         background-color: dodgerblue;
       }
 
+      @media (min-width: 1400px) {
+        #view-list {
+        margin-top: 30%;
+        background-color: dodgerblue;
+      }
+
+      .nav {
+        padding: 8%;
+      }
+      }
+
       #search-barang {
         background-color: yellow;
       }
 
       #barang-charts {
         background-color: red;
+      }
+
+      #barang-records {
+        background-color:aquamarine;
+      }
+
+      #submit-link{
+        background-color:chartreuse;
       }
     </style>
 
@@ -134,6 +152,8 @@
       <a class="nav" id="barang-charts" href="/barangay_charts">View Barangay Charts</a>
       <a class="nav" id="search-barang" href="/find_barangay">Search Barangay Record</a>
       <a class="nav" id="create-barang" href="/create_barang">Add New Barangay Month</a>
+      <a class="nav" id="barang-records" href="/barangay_creation_records">Barangay Creation Records</a>
+      <a class="nav" id="submit-link" href="/barangay_link">Submit Document Links</a>
     </div>
     {% endif %}
 
@@ -171,7 +191,7 @@
       integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
       crossorigin="anonymous"
     ></script>
-
+  </body>
 {% block javascript %}
 <script type="text/javascript">
 
@@ -184,74 +204,7 @@ function deleteNote(noteId) {
   });
   }
 
-function table_road_kp_vawc() {
- var x = document.getElementById("table-road-kp-vawc")
- var y = document.getElementById("table-road-kp-vawc-btn")
-  if (x.style.display === "" && y.style.backgroundColor === "cyan"){
-    x.style.display = "none"
-    y.style.backgroundColor = "yellow"
-  } else {
-    x.style.display = ""
-    y.style.backgroundColor = "cyan"
- }
-}
-
-function table_manila_bay() {
- var x = document.getElementById("table-manila-bay")
- var y = document.getElementById("table-manila-bay-btn")
-  if (x.style.display === "" && y.style.backgroundColor === "cyan"){
-    x.style.display = "none"
-    y.style.backgroundColor = "yellow"
-  } else {
-    x.style.display = ""
-    y.style.backgroundColor = "cyan"
- }
-}
-
-function table_job_bfdp_kasambahay() {
- var x = document.getElementById("table-job-bfdp-kasambahay")
- var y = document.getElementById("table-job-bfdp-kasambahay-btn")
-  if (x.style.display === "" && y.style.backgroundColor === "cyan"){
-    x.style.display = "none"
-    y.style.backgroundColor = "yellow"
-  } else {
-    x.style.display = ""
-    y.style.backgroundColor = "cyan"
- }
-}
-
-function table_kalinisan() {
- var x = document.getElementById("table-kalinisan")
- var y = document.getElementById("table-kalinisan-btn")
-  if (x.style.display === "" && y.style.backgroundColor === "cyan"){
-    x.style.display = "none"
-    y.style.backgroundColor = "yellow"
-  } else {
-    x.style.display = ""
-    y.style.backgroundColor = "cyan"
- }
-}
-
-function updateSelectColor(selectElement) {
-    // Get the selected option value
-    let selectedValue = selectElement.value;
-
-    // Define color mapping
-    let colors = {
-        "completed": "lightgreen",
-        "incomplete": "cyan",
-        "unsubmitted": "orange",
-        "late": "red",
-        "unedited": "white"
-    };
-
-    // Apply background color based on selection
-    selectElement.style.backgroundColor = colors[selectedValue] || "white";
-    selectElement.style.fontWeight = "bold"; // Make text bold for better visibility
-}
-
 </script>
 
 {% endblock %}
-  </body>
 </html>
