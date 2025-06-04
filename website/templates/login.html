@@ -1,5 +1,5 @@
-{% extends "base.html" %} 
-{% block title %}Login{% endblock %} 
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
 {% block content %}
 <div class="card shadow" style="width: 50%; margin-left: 25%; margin-top: 2%;">
   <form method="POST">
@@ -7,19 +7,46 @@
       <h3 align="center">Login with OTP</h3>
     </div>
     <div class="card-body">
+
+      <!-- Instructions -->
+      <p class="text-muted" style="font-size: 0.95rem;">
+        First, click "Request OTP" to receive a 6-digit code in your email.
+        Then enter the code below and click "Submit OTP" to log in.
+      </p>
+
+      <!-- OTP Input -->
       <div class="form-group">
-        <label for="otp">OTP Code</label>
-        <input type="text" class="form-control" id="otp" name="otp" placeholder="Enter OTP if you have one">
+        <label for="otp">Enter OTP Code</label>
+        <input
+          type="text"
+          class="form-control"
+          id="otp"
+          name="otp"
+          placeholder="Enter the 6-digit code you received"
+        />
       </div>
+
       <br />
+
+      <!-- Buttons -->
       <div class="d-flex justify-content-between">
-        <!-- Request OTP button -->
-        <button type="submit" name="action" value="request" class="btn btn-secondary">
+        <!-- Request OTP -->
+        <button
+          type="submit"
+          name="action"
+          value="request"
+          class="btn btn-secondary"
+        >
           Request OTP
         </button>
 
-        <!-- Submit OTP button -->
-        <button type="submit" name="action" value="submit" class="btn btn-primary">
+        <!-- Submit OTP -->
+        <button
+          type="submit"
+          name="action"
+          value="submit"
+          class="btn btn-primary"
+        >
           Submit OTP
         </button>
       </div>
