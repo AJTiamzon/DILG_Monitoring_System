@@ -1,6 +1,7 @@
 from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
+from datetime import datetime, timedelta
 
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,6 +50,11 @@ class SubjectLinks3(db.Model):
     link = db.Column(db.String(10000))
 
     barangay_id = db.Column(db.Integer, db.ForeignKey('brngy_files4.id'))
+
+class OTPCode2(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(6), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False)
 
 
 class Barangay_Names(db.Model):

@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
-from .models import User
+from .models import User, OTPCode2
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db, mail   ##means from __init__.py import db
 from flask_login import login_user, login_required, logout_user, current_user
+from sqlalchemy import and_
 
 
 auth = Blueprint('auth', __name__)
@@ -18,11 +19,16 @@ def login():
     if request.method == 'POST':
         action = request.form.get('action')
 
+        now = datetime.utcnow()
+        expiry_time = now - timedelta(minutes=5)  # Define early so it's always available
+
         if action == 'request':
-            # Generate and send new OTP
             otp_code = str(random.randint(100000, 999999))
-            session['otp_code'] = otp_code
-            session['otp_timestamp'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = now
+
+            new_otp = OTPCode2(code=otp_code, created_at=timestamp)
+            db.session.add(new_otp)
+            db.session.commit()
 
             msg = Message(subject='Your OTP Code',
                           sender='youremail@gmail.com',
@@ -35,43 +41,37 @@ def login():
         elif action == 'submit':
             input_otp = request.form.get('otp')
 
-            stored_otp = session.get('otp_code')
-            otp_time = session.get('otp_timestamp')
+            # Find a valid OTP
+            otp_entry = OTPCode2.query.filter_by(code=input_otp).filter(OTPCode2.created_at >= expiry_time).first()
 
-            if stored_otp and otp_time:
-                otp_time = datetime.strptime(otp_time, "%Y-%m-%d %H:%M:%S")
-                now = datetime.now()
-
-                if now - otp_time > timedelta(minutes=5):
-                    flash("OTP has expired. Please request a new one.", category="error")
-                    session.pop('otp_code', None)
-                    session.pop('otp_timestamp', None)
-                elif input_otp == stored_otp:
-                    user = User.query.filter_by(email='adrianjennelltiamzon@gmail.com').first()
+            if otp_entry:
+                # Log in the boss user
+                user = User.query.filter_by(email='adrianjennelltiamzon@gmail.com').first()
+                if user:
                     login_user(user, remember=True)
-                    session.permanent = True
                     flash("Logged in successfully with OTP.", category="success")
-                    session.pop('otp_code', None)
-                    session.pop('otp_timestamp', None)
+
+                    # Remove used OTP
+                    db.session.delete(otp_entry)
+                    db.session.commit()
+
                     return redirect(url_for('views.home'))
                 else:
-                    flash("Invalid OTP. Please try again.", category="error")
+                    flash("User not found.", category="error")
             else:
-                flash("No OTP found. Please request one first.", category="error")
+                flash("Invalid or expired OTP. Please try again.", category="error")
+
+        # Cleanup: Remove expired OTPs from the database
+        OTPCode2.query.filter(OTPCode2.created_at < expiry_time).delete()
+        db.session.commit()
 
     return render_template("login.html", user=current_user)
-
 
 @auth.route('/logout')
 @login_required
 def logout():
     logout_user()
-
-    # Clear OTP session data
-    session.pop('otp_code', None)
-    session.pop('otp_timestamp', None)
-
-    flash("You have been logged out. Please request a new OTP to log in again.", category="info")
+    flash("You have been logged out.", category="info")
     return redirect(url_for('auth.login'))
 
 
